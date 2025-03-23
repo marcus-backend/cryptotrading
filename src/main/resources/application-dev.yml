@@ -1,0 +1,39 @@
+server:
+  port: 8081
+
+api:
+  prefix: api/v1
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:tcp://localhost:1521/sb3-db
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+endpoint:
+  confirmUser: http://localhost:${server.port}/user/confirm
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+
+jwt:
+  expiryHour: 10
+  expiryDate: 30
+  accessKey: d26dd3d59684a84144489ebe03a661f9a4883427a2745466ff7c7f530c2443ca
+  refreshKey: acee1449ca857f5a39ccc6d94ae2e107b211e87da3d13a0c21f86eaea137937c
+  resetKey: 8fecf05c1cdbacb2c04c2ee1e31af0fe8a3663eac621c21d00a184f764f41004

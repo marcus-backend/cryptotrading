@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: crypto trading
+  profiles:
+    active: @spring.profiles.active@
+
+
+logging:
+  level:
+    org:
+      springframework:
+        security: debug
+    root: info
+
+  file:
+    name: ./logs/application.log
