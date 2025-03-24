@@ -15904,3 +15904,6 @@ com.fasterxml.jackson.databind.exc.InvalidDefinitionException: No serializer fou
 2025-03-24T21:58:50.261+07:00  INFO 43028 --- [crypto trading] [scheduling-1] c.marcus.service.impl.CoinServiceImpl    : Coin prices updated at 2025-03-24T21:58:50.261156100
 2025-03-24T21:59:00.351+07:00  INFO 43028 --- [crypto trading] [scheduling-1] c.marcus.service.impl.CoinServiceImpl    : Coin prices updated at 2025-03-24T21:59:00.351253900
 2025-03-24T21:59:10.328+07:00  INFO 43028 --- [crypto trading] [scheduling-1] c.marcus.service.impl.CoinServiceImpl    : Coin prices updated at 2025-03-24T21:59:10.328483500
+2025-03-24T21:59:20.297+07:00  INFO 43028 --- [crypto trading] [scheduling-1] c.marcus.service.impl.CoinServiceImpl    : Coin prices updated at 2025-03-24T21:59:20.297900700
+2025-03-24T21:59:30.265+07:00  INFO 43028 --- [crypto trading] [scheduling-1] c.marcus.service.impl.CoinServiceImpl    : Coin prices updated at 2025-03-24T21:59:30.265853400
+2025-03-24T21:59:40.380+07:00  INFO 43028 --- [crypto trading] [scheduling-1] c.marcus.service.impl.CoinServiceImpl    : Coin prices updated at 2025-03-24T21:59:40.380762400
