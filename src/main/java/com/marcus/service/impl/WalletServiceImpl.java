@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class WalletServiceImpl implements WalletService {
             wallet = new Wallet();
             wallet.setUser(user);
             wallet.setBalance(BigDecimal.ZERO);
-            wallet.setCurrency("USDT"); // Assuming USDT as default; adjust if needed
+            wallet.setCurrency("USDT");
             wallet = walletRepository.save(wallet);
         }
         return wallet;
@@ -41,45 +40,11 @@ public class WalletServiceImpl implements WalletService {
                 throw new BusinessException("Insufficient funds for this transaction!");
             }
             newBalance = wallet.getBalance().subtract(order.getPrice());
-        } else { // SELL
+        } else {
             newBalance = wallet.getBalance().add(order.getPrice());
         }
 
         wallet.setBalance(newBalance);
         return walletRepository.save(wallet);
-    }
-
-    // === internal test
-    private Wallet addBalance(Wallet wallet, Long money) {
-        BigDecimal balance = wallet.getBalance();
-        BigDecimal newBalance = balance.add(BigDecimal.valueOf(money));
-        wallet.setBalance(newBalance);
-        return walletRepository.save(wallet);
-    }
-
-    private Wallet findWalletById(Long id) {
-        Optional<Wallet> wallet = walletRepository.findById(id);
-        if (wallet.isPresent()) {
-            return wallet.get();
-        }
-        throw new BusinessException("Wallet not found!");
-    }
-
-    private Wallet walletToWalletTransfer(User sender, Wallet receiverWallet, Long amount) {
-        Wallet senderWallet = getUserWallet(sender);
-        BigDecimal amountBD = BigDecimal.valueOf(amount);
-        if (senderWallet.getBalance().compareTo(amountBD) < 0) {
-            throw new BusinessException("Insufficient balance...");
-        }
-
-        BigDecimal senderBalance = senderWallet.getBalance().subtract(amountBD);
-        senderWallet.setBalance(senderBalance);
-        walletRepository.save(senderWallet);
-
-        BigDecimal receiverBalance = receiverWallet.getBalance().add(amountBD);
-        receiverWallet.setBalance(receiverBalance);
-        walletRepository.save(receiverWallet);
-
-        return senderWallet;
     }
 }

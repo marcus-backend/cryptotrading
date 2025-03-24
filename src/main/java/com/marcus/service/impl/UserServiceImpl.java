@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
         Wallet wallet = Wallet.builder()
                 .user(savedUser)
                 .balance(BigDecimal.valueOf(50000))
+                .currency("USDT")
                 .build();
         walletRepository.save(wallet);
         log.info("init wallet for new user with default : {} USDT", 50000);

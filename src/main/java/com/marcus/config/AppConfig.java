@@ -33,8 +33,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Profile("!prod")
 @RequiredArgsConstructor
 public class AppConfig {
-    
-    private final UserService userService;
+        private final UserService userService;
     private final PreFilter preFilter;
 
     @Bean
@@ -75,8 +74,7 @@ public class AppConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.
-//                                requestMatchers(API_WHITE_LIST).permitAll()
-                                requestMatchers("/api/**","/auth/**","/user/**").permitAll()
+                                requestMatchers(API_WHITE_LIST).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
@@ -91,7 +89,6 @@ public class AppConfig {
                 .requestMatchers(WEB_WHITE_LIST);
     }
     
-    // config to manage route
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

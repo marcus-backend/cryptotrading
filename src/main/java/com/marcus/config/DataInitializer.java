@@ -2,16 +2,22 @@ package com.marcus.config;
 
 import com.marcus.dto.request.AddressDTO;
 import com.marcus.dto.request.UserRequestDTO;
+import com.marcus.dto.response.WalletResponse;
+import com.marcus.model.core.Wallet;
+import com.marcus.repository.core.WalletRepository;
 import com.marcus.service.UserService;
+import com.marcus.service.WalletService;
 import com.marcus.util.Gender;
 import com.marcus.util.UserStatus;
 import com.marcus.util.UserType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -22,6 +28,7 @@ import java.util.Date;
 public class DataInitializer {
 
     private final UserService userService;
+    private final WalletRepository walletRepository;
 
     @Bean
     public CommandLineRunner initData() {

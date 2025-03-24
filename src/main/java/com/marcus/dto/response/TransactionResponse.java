@@ -1,10 +1,8 @@
 package com.marcus.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.marcus.model.core.Transaction;
+import com.marcus.util.OrderType;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -12,19 +10,24 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionResponse {
     private Long id;
-    private Long userId;
-    private Long coinId;
-    private String coinSymbol;
-    private Long walletId;
     private String cryptoPair;
-    private String type;
+    private OrderType type;
     private BigDecimal amount;
     private BigDecimal price;
     private LocalDateTime timestamp;
+    private String coinSymbol; // Simplified Coin representation
+    private String walletCurrency; // Simplified Wallet representation
+
+    public TransactionResponse(Transaction transaction) {
+        this.id = transaction.getId();
+        this.cryptoPair = transaction.getCryptoPair();
+        this.type = transaction.getType();
+        this.amount = transaction.getAmount();
+        this.price = transaction.getPrice();
+        this.timestamp = transaction.getTimestamp();
+        this.coinSymbol = transaction.getCoin() != null ? transaction.getCoin().getSymbol() : null;
+        this.walletCurrency = transaction.getWallet() != null ? transaction.getWallet().getCurrency() : null;
+    }
 }

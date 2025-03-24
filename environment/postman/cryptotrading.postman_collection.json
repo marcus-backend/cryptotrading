@@ -1,0 +1,504 @@
+{
+	"info": {
+		"_postman_id": "24117779-c52d-45ab-b753-d9b8ca570da9",
+		"name": "cryptotrading",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17644932"
+	},
+	"item": [
+		{
+			"name": "open-api",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get token success\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    const res = pm.response.json();\r",
+									"    pm.collectionVariables.set(\"access_token\", res.accessToken);\r",
+									"    pm.collectionVariables.set(\"refresh_token\", res.refreshToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"test-user-1\",\n  \"password\": \"123123\",\n  \"platform\": \"web\",\n  \"deviceToken\": \"x-token\",\n  \"versionApp\": \"1.1.1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/access-token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"access-token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "create user",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "trading",
+			"item": [
+				{
+					"name": "aggregated price",
+					"item": [
+						{
+							"name": "get aggregated price [SELL]",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "get aggregated price [IN VALID]",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "get aggregated price [BUY]",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "aggregated - ETHUSDT - SELL",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "trade",
+					"item": [
+						{
+							"name": "SELL",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOltdLCJzdWIiOiJ0ZXN0LXVzZXItMSIsImlhdCI6MTc0Mjc1MjU3MiwiZXhwIjoxNzQyNzg4NTcyfQ.kl61_jPbQcsMe2BXW2uHWoam2xTstE8-RGlPSK9z8n4"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"symbol\": \"ETHUSDT\",\n  \"amount\": \"20\",\n  \"tradeType\": \"SELL\",\n  \"price\": \"1997.31\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/trading/trade",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"trading",
+										"trade"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BUY",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"symbol\": \"ETHUSDT\",\n  \"amount\": \"1.5\",\n  \"tradeType\": \"BUY\",\n  \"price\": \"1992.31\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/trading/trade",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"trading",
+										"trade"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BUY - Insufficient Funds",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOltdLCJzdWIiOiJ0ZXN0LXVzZXItMSIsImlhdCI6MTc0Mjc1MjU3MiwiZXhwIjoxNzQyNzg4NTcyfQ.kl61_jPbQcsMe2BXW2uHWoam2xTstE8-RGlPSK9z8n4"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"symbol\": \"ETHUSDT\",\n  \"amount\": \"20\",\n  \"tradeType\": \"BUY\",\n  \"price\": \"1996.18\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/trading/trade",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"trading",
+										"trade"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get wallet",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/v1/trading/wallet",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"trading",
+										"wallet"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get transactions",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/v1/trading/transactions?page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"trading",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "coins",
+					"item": [
+						{
+							"name": "Aggregated Price - Buy Price for ETHUSDT",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/v1/coins/aggregated-price?symbol=ETHUSDT&type=BUY",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"coins",
+										"aggregated-price"
+									],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "ETHUSDT"
+										},
+										{
+											"key": "type",
+											"value": "BUY"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Aggregated Price - Sell Price for BTCUSDT",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/v1/coins/aggregated-price?symbol=BTCUSDT&type=SELL",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"coins",
+										"aggregated-price"
+									],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "BTCUSDT"
+										},
+										{
+											"key": "type",
+											"value": "SELL"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Aggregated Price - Case Invalid",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/v1/coins/aggregated-price?symbol=XRPUSDT&type=BUY",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"coins",
+										"aggregated-price"
+									],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "XRPUSDT"
+										},
+										{
+											"key": "type",
+											"value": "BUY"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "host",
+			"value": "http://localhost:8081/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": ""
+		}
+	]
+}

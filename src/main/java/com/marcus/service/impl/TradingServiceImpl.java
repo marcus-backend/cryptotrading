@@ -70,26 +70,21 @@ public class TradingServiceImpl implements TradingService {
     }
 
     @Override
-    public Page<TransactionResponse> getTransactions(Long userId, Pageable pageable) {
+    public PageResponse<List<TransactionResponse>> getTransactions(Long userId, Pageable pageable) {
         log.info("Fetching transactions for userId={} with pageable: {}", userId, pageable);
-        Page<Transaction> transactions = transactionRepository.findByUserId(userId, pageable);
-        return transactions.map(this::mapToDTO);
-    }
-
-    private TransactionResponse mapToDTO(Transaction transaction) {
-        return TransactionResponse.builder()
-                .id(transaction.getId())
-                .userId(transaction.getUser().getId())
-                .coinId(transaction.getCoin().getId())
-                .coinSymbol(transaction.getCoin().getSymbol())
-                .walletId(transaction.getWallet().getId())
-                .cryptoPair(transaction.getCryptoPair())
-                .type(transaction.getType().name())
-                .amount(transaction.getAmount())
-                .price(transaction.getPrice())
-                .timestamp(transaction.getTimestamp())
+        Page<Transaction> page = transactionRepository.findByUserId(userId, pageable);
+        List<TransactionResponse> transactions = page.stream()
+                .map(TransactionResponse::new)
+                .toList();
+        return PageResponse.<List<TransactionResponse>>builder()
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .data(transactions)
                 .build();
     }
+
 
     @Override
     public Wallet getWalletBalance(Long userId) {
