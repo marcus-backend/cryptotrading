@@ -36,8 +36,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
 
     @Override
-    public Order createOrder(User user, OrderItem orderItem, OrderType orderType) {
-        // Use askPrice for BUY, bidPrice for SELL
+    public Order create(User user, OrderItem orderItem, OrderType orderType) {
+        // Use ASK for "BUY", BID for "SELL"
         BigDecimal price = orderType == OrderType.BUY
                 ? orderItem.getCoin().getAskPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()))
                 : orderItem.getCoin().getBidPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
@@ -73,12 +73,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     public Order buyAsset(Coin coin, double quantity, User user) throws BusinessException {
-        if (quantity <= 0) {
+        if (quantity <= 0)
             throw new BusinessException("Quantity should be greater than 0");
-        }
-        BigDecimal buyPrice = coin.getAskPrice(); // Use askPrice for BUY as per hint
+
+        BigDecimal buyPrice = coin.getAskPrice(); // Use askPrice for BUY
         OrderItem orderItem = createOrderItem(coin, quantity, buyPrice, BigDecimal.ZERO);
-        Order order = createOrder(user, orderItem, OrderType.BUY);
+        Order order = this.create(user, orderItem, OrderType.BUY);
         orderItem.setOrder(order);
 
         walletService.payOrderPayment(order, user);
@@ -116,7 +116,7 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal buyPrice = BigDecimal.valueOf(assetToSell.getBuyPrice());
         OrderItem orderItem = createOrderItem(coin, quantity, buyPrice, sellPrice);
-        Order order = createOrder(user, orderItem, OrderType.SELL);
+        Order order = create(user, orderItem, OrderType.SELL);
         orderItem.setOrder(order);
 
         if (assetToSell.getQuantity() >= quantity) {
@@ -141,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order processOrder(Coin coin, double quantity, OrderType orderType, User user) throws BusinessException {
+    public Order process(Coin coin, double quantity, OrderType orderType, User user) throws BusinessException {
         if (orderType == OrderType.BUY) {
             return buyAsset(coin, quantity, user);
         } else if (orderType == OrderType.SELL) {

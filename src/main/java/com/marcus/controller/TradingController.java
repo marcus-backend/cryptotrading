@@ -5,9 +5,9 @@ import com.marcus.dto.request.TradeRequest;
 import com.marcus.dto.response.ResponseData;
 import com.marcus.dto.response.ResponseError;
 import com.marcus.dto.response.TradeResponse;
+import com.marcus.dto.response.TransactionResponse;
 import com.marcus.exception.BusinessException;
 import com.marcus.model.auth.User;
-import com.marcus.model.core.Transaction;
 import com.marcus.model.core.Wallet;
 import com.marcus.service.AuthenticationService;
 import com.marcus.service.TradingService;
@@ -19,6 +19,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * Functional Scope
@@ -53,8 +53,7 @@ public class TradingController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseData<?> tradeCrypto(@Valid @RequestBody TradeRequest request) {
         log.info("Request to trade cryptocurrency: symbol={}, type={}", request.getSymbol(), request.getTradeType());
-        String username = auth.getUsername();
-        User user = userService.getByUsername(username);
+        User user = userService.getByUsername(auth.getUsername());
         if (user == null) {
             throw new BusinessException("User not found!");
         }
@@ -75,9 +74,12 @@ public class TradingController {
     @Operation(summary = "Get user's transactions", description = "API to get user's transactions")
     @GetMapping("/transactions")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseData<?> getTransactions(@RequestParam @Min(1) long userId) {
-        log.info("Request to get transactions for userId={}", userId);
-        List<Transaction> transactions = tradingService.getTransactions(userId);
+    public ResponseData<?> getTransactions(
+            @RequestParam @Min(1) long userId,
+            Pageable pageable
+    ) {
+        log.info("Request to get transactions for userId={} with pagination: {}", userId, pageable);
+        Page<TransactionResponse> transactions = tradingService.getTransactions(userId, pageable);
         return new ResponseData<>(
                 HttpStatus.OK.value(),
                 Translator.toLocale("trading.transactions.success"),

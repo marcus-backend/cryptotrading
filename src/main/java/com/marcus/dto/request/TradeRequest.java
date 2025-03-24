@@ -11,15 +11,15 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class TradeRequest {
-    @NotBlank
+    @NotBlank(message = "Symbol must not be blank!")
     private String symbol;
 
-    @NotNull
-    private BigDecimal amount; // Renamed from quantity to match TradingServiceImpl
+    @NotNull(message = "Amount must not be null!")
+    private BigDecimal amount;
 
-    @NotNull
+    @NotNull(message = "TradeType must not be null")
     private OrderType tradeType;
 
-    @NotNull
-    private BigDecimal price; // Price requested by the user for validation
+    @NotNull(message = "Price must not be null")
+    private BigDecimal price;
 }

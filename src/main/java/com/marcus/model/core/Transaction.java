@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-@Table(name = "tbl_transactions")
+@Table(name = "tbl_transaction")
 public class Transaction extends AbstractEntity<Long> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

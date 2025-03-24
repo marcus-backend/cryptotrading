@@ -1,6 +1,7 @@
 package com.marcus.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -13,6 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.Date;
 
 @RestControllerAdvice
+@Slf4j(topic = "Global Exception")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({
@@ -23,7 +25,7 @@ public class GlobalExceptionHandler {
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(Exception e, WebRequest request) {
-        System.out.println("==========> handleValidationException");
+        log.info("==========> handleValidationException");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
@@ -54,7 +56,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalServerErrorException(Exception e, WebRequest request) {
-        System.out.println("==========> handleInternalServerErrorException");
+        log.info("==========> handleInternalServerErrorException");
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -63,6 +65,33 @@ public class GlobalExceptionHandler {
         if(e instanceof MethodArgumentTypeMismatchException){
             errorResponse.setMessage("Failed to convert value of type");
         }
+        return errorResponse;
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidTokenException(InvalidTokenException e, WebRequest request) {
+        log.info("==========> handleInvalidTokenException");
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setError("Unauthorized");
+        errorResponse.setMessage(e.getMessage());
+        return errorResponse;
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBusinessException(BusinessException e, WebRequest request) {
+        log.info("==========> handleBusinessException: {}", e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setError("Business Rule Violation");
+        errorResponse.setMessage(e.getMessage());
+
         return errorResponse;
     }
 }

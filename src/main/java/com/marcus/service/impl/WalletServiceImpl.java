@@ -32,42 +32,6 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Wallet addBalance(Wallet wallet, Long money) {
-        BigDecimal balance = wallet.getBalance();
-        BigDecimal newBalance = balance.add(BigDecimal.valueOf(money));
-        wallet.setBalance(newBalance);
-        return walletRepository.save(wallet);
-    }
-
-    @Override
-    public Wallet findWalletById(Long id) {
-        Optional<Wallet> wallet = walletRepository.findById(id);
-        if (wallet.isPresent()) {
-            return wallet.get();
-        }
-        throw new BusinessException("Wallet not found!");
-    }
-
-    @Override
-    public Wallet walletToWalletTransfer(User sender, Wallet receiverWallet, Long amount) {
-        Wallet senderWallet = getUserWallet(sender);
-        BigDecimal amountBD = BigDecimal.valueOf(amount);
-        if (senderWallet.getBalance().compareTo(amountBD) < 0) {
-            throw new BusinessException("Insufficient balance...");
-        }
-
-        BigDecimal senderBalance = senderWallet.getBalance().subtract(amountBD);
-        senderWallet.setBalance(senderBalance);
-        walletRepository.save(senderWallet);
-
-        BigDecimal receiverBalance = receiverWallet.getBalance().add(amountBD);
-        receiverWallet.setBalance(receiverBalance);
-        walletRepository.save(receiverWallet);
-
-        return senderWallet;
-    }
-
-    @Override
     public Wallet payOrderPayment(Order order, User user) {
         Wallet wallet = getUserWallet(user);
         BigDecimal newBalance;
@@ -83,5 +47,39 @@ public class WalletServiceImpl implements WalletService {
 
         wallet.setBalance(newBalance);
         return walletRepository.save(wallet);
+    }
+
+    // === internal test
+    private Wallet addBalance(Wallet wallet, Long money) {
+        BigDecimal balance = wallet.getBalance();
+        BigDecimal newBalance = balance.add(BigDecimal.valueOf(money));
+        wallet.setBalance(newBalance);
+        return walletRepository.save(wallet);
+    }
+
+    private Wallet findWalletById(Long id) {
+        Optional<Wallet> wallet = walletRepository.findById(id);
+        if (wallet.isPresent()) {
+            return wallet.get();
+        }
+        throw new BusinessException("Wallet not found!");
+    }
+
+    private Wallet walletToWalletTransfer(User sender, Wallet receiverWallet, Long amount) {
+        Wallet senderWallet = getUserWallet(sender);
+        BigDecimal amountBD = BigDecimal.valueOf(amount);
+        if (senderWallet.getBalance().compareTo(amountBD) < 0) {
+            throw new BusinessException("Insufficient balance...");
+        }
+
+        BigDecimal senderBalance = senderWallet.getBalance().subtract(amountBD);
+        senderWallet.setBalance(senderBalance);
+        walletRepository.save(senderWallet);
+
+        BigDecimal receiverBalance = receiverWallet.getBalance().add(amountBD);
+        receiverWallet.setBalance(receiverBalance);
+        walletRepository.save(receiverWallet);
+
+        return senderWallet;
     }
 }

@@ -196,4 +196,9 @@ public class UserServiceImpl implements UserService {
                         .phone(user.getPhone())
                         .build()).toList();
     }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
 }

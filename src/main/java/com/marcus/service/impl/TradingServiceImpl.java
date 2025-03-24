@@ -1,7 +1,9 @@
 package com.marcus.service.impl;
 
 import com.marcus.dto.request.TradeRequest;
+import com.marcus.dto.response.PageResponse;
 import com.marcus.dto.response.TradeResponse;
+import com.marcus.dto.response.TransactionResponse;
 import com.marcus.exception.BusinessException;
 import com.marcus.model.auth.User;
 import com.marcus.model.core.Coin;
@@ -16,6 +18,9 @@ import com.marcus.service.TradingService;
 import com.marcus.service.WalletService;
 import com.marcus.util.OrderType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +30,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TradingServiceImpl implements TradingService {
     private final CoinRepository coinRepository;
     private final OrderService orderService;
@@ -34,23 +40,18 @@ public class TradingServiceImpl implements TradingService {
 
     @Override
     public TradeResponse tradeCrypto(TradeRequest request, User user) {
-        Coin coin = coinRepository.findBySymbol(request.getSymbol())
-                .orElseThrow(() -> new BusinessException("Coin not found"));
-
-        // Determine the current price based on trade type (Ask for BUY, Bid for SELL)
+        Coin coin = coinRepository.findBySymbol(request.getSymbol()).orElseThrow(() -> new BusinessException("Coin not found"));
+        //  ASK for "BUY" - BID for "SELL"
         BigDecimal currentPrice = request.getTradeType() == OrderType.BUY ? coin.getAskPrice() : coin.getBidPrice();
 
         // Validate requested price against current price (1% threshold)
         BigDecimal requestPrice = request.getPrice();
         BigDecimal threshold = requestPrice.multiply(BigDecimal.valueOf(0.01));
-        if (currentPrice.subtract(requestPrice).abs().compareTo(threshold) > 0) {
+        if (currentPrice.subtract(requestPrice).abs().compareTo(threshold) > 0)
             throw new BusinessException("Price has changed significantly. Please retry with the updated price: " + currentPrice);
-        }
 
-        // Process the order
-        Order order = orderService.processOrder(coin, request.getAmount().doubleValue(), request.getTradeType(), user);
-
-        // Update wallet and record transaction
+        // Handle business process with market price instead request price
+        Order order = orderService.process(coin, request.getAmount().doubleValue(), request.getTradeType(), user);
         Wallet wallet = walletService.getUserWallet(user);
 
         Transaction transaction = Transaction.builder()
@@ -69,8 +70,25 @@ public class TradingServiceImpl implements TradingService {
     }
 
     @Override
-    public List<Transaction> getTransactions(Long userId) {
-        return transactionRepository.findByUserId(userId);
+    public Page<TransactionResponse> getTransactions(Long userId, Pageable pageable) {
+        log.info("Fetching transactions for userId={} with pageable: {}", userId, pageable);
+        Page<Transaction> transactions = transactionRepository.findByUserId(userId, pageable);
+        return transactions.map(this::mapToDTO);
+    }
+
+    private TransactionResponse mapToDTO(Transaction transaction) {
+        return TransactionResponse.builder()
+                .id(transaction.getId())
+                .userId(transaction.getUser().getId())
+                .coinId(transaction.getCoin().getId())
+                .coinSymbol(transaction.getCoin().getSymbol())
+                .walletId(transaction.getWallet().getId())
+                .cryptoPair(transaction.getCryptoPair())
+                .type(transaction.getType().name())
+                .amount(transaction.getAmount())
+                .price(transaction.getPrice())
+                .timestamp(transaction.getTimestamp())
+                .build();
     }
 
     @Override

@@ -10,10 +10,10 @@ import com.marcus.util.OrderType;
 import java.util.List;
 
 public interface OrderService {
-    Order createOrder(User user, OrderItem orderItem, OrderType orderType);
     Order getOrderById(Long orderId);
     List<Order> getAllOrdersOfUser(Long userId, OrderType orderType, String assetSymbol);
     Order buyAsset(Coin coin, double quantity, User user) throws BusinessException;
     Order sellAsset(Coin coin, double quantity, User user) throws BusinessException;
-    Order processOrder(Coin coin, double quantity, OrderType orderType, User user) throws BusinessException;
+    Order create(User user, OrderItem orderItem, OrderType orderType);
+    Order process(Coin coin, double quantity, OrderType orderType, User user) throws BusinessException;
 }

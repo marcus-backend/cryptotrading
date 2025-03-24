@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tbl_coins")
+@Table(name = "tbl_coin")
 public class Coin extends AbstractEntity<Long> {
     private String symbol;
     private BigDecimal bidPrice; // Best bid price (for sell orders)

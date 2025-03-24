@@ -34,4 +34,5 @@ public interface UserService {
 
     List<UserDetailResponse> getUsers(int pageNo, int pageSize);
 
+    boolean existsByUsername(String username);
 }
