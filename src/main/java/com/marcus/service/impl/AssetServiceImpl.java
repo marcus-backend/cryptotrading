@@ -33,18 +33,6 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    public Asset getAssetByUserIdAndId(Long userId, Long assetId) {
-        return assetRepository.findByUserIdAndId(userId, assetId)
-                .orElseThrow(() -> new BusinessException("Asset not found for user ID: " + userId + " and asset ID: " + assetId));
-    }
-
-    @Override
-    public List<Asset> getUserAssets(Long userId) {
-        return assetRepository.findByUserId(userId);
-    }
-
-
-    @Override
     public Asset updateAsset(Long assetId, double quantity) {
         Asset asset = getAssetById(assetId);
         double newQuantity = asset.getQuantity() + quantity;
@@ -57,7 +45,7 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     public Asset findAssetByUserIdAndCoinId(Long userId, Long coinId) {
-        return assetRepository.findByUserIdAndCoinId(userId, coinId); // May return null as per your original logic
+        return assetRepository.findByUserIdAndCoinId(userId, coinId);
     }
 
     @Override

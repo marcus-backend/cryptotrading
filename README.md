@@ -1,22 +1,20 @@
 # Crypto Trading System Testing Guide
 
 This guide provides detailed steps to test the crypto trading system built with Spring Boot and an in-memory H2 database. The system supports Ethereum (ETHUSDT) and Bitcoin (BTCUSDT) trading pairs, with price aggregation from Binance and Huobi, and includes APIs for trading, wallet balance, and transaction history.
-
+**Swagger for testing:* http://localhost:8081/swagger-ui/index.html#/
 ## Prerequisites
 - **Environment**: Spring Boot application with H2 database running.
 - **Start Command**: Run `CryptoTradingApplication.java` (e.g., via IDE or `mvn spring-boot:run`).
 - **Tools**: Use curl, Postman, or any HTTP client.
 - **API Prefix**: Assumes `${api.prefix}` is `/api` (adjust if different).
 - **H2 Console**: Optional, access at `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:cryptodb`, username: `sa`, password: empty).
-- **Authentication**: Assumes user "testuser" is authenticated (mocked via `auth.getUsername()`).
+- **Authentication**: Assumes user "test-user-1" is authenticated (mocked via `auth.getUsername()`).
 
 ## Initial Setup
 The application initializes mock data on startup:
-- **User**: "testuser" with active status.
+- **User**: "test-user-1" with active status.
 - **Wallets**:
     - 50,000 USDT
-    - 0 ETH
-    - 0 BTC
 - **Coins**: ETHUSDT and BTCUSDT with initial prices of 0 (updated by scheduler).
 
 ## Testing Steps
@@ -41,20 +39,20 @@ The application initializes mock data on startup:
 
 **Description**: Retrieves the latest best aggregated price for a symbol (ask price for BUY, bid price for SELL).
 
-**Endpoint**: `http://localhost:8080/api/coins/aggregated-price?symbol={symbol}&type={type}`
+**Endpoint**: `http://localhost:8081/api/v1/coins/aggregated-price?symbol={symbol}&type={type}`
 
 **Test Cases**:
 #### 2.1 Buy Price for ETHUSDT
 **Request**:
 ```bash
-curl "http://localhost:8080/api/coins/aggregated-price?symbol=ETHUSDT&type=BUY"
+curl "http://localhost:8081/api/v1/coins/aggregated-price?symbol=ETHUSDT&type=BUY"
 ```
 **Expected Response**:
 ```json
 {
   "status": 200,
   "message": "Aggregated price retrieved successfully",
-  "data": "3005.50"  // Example ask price
+  "data": 2004.04  // Example ask price
 }
 ```
 **Verification**: Note the ask price for use in Step 3.
@@ -62,14 +60,14 @@ curl "http://localhost:8080/api/coins/aggregated-price?symbol=ETHUSDT&type=BUY"
 #### 2.2 Sell Price for BTCUSDT
 **Request**:
 ```bash
-curl "http://localhost:8080/api/coins/aggregated-price?symbol=BTCUSDT&type=SELL"
+curl "http://localhost:8081/api/v1/coins/aggregated-price?symbol=BTCUSDT&type=SELL"
 ```
 **Expected Response**:
 ```json
 {
   "status": 200,
   "message": "Aggregated price retrieved successfully",
-  "data": "50000.00"  // Example bid price
+  "data": 86224.73  // Example bid price
 }
 ```
 **Verification**: Note the bid price.
@@ -77,7 +75,7 @@ curl "http://localhost:8080/api/coins/aggregated-price?symbol=BTCUSDT&type=SELL"
 #### 2.3 Invalid Symbol
 **Request**:
 ```bash
-curl "http://localhost:8080/api/coins/aggregated-price?symbol=XRPUSDT&type=BUY"
+curl "http://localhost:8081/api/v1/coins/aggregated-price?symbol=XRPUSDT&type=BUY"
 ```
 **Expected Response**:
 ```json
@@ -88,28 +86,44 @@ curl "http://localhost:8080/api/coins/aggregated-price?symbol=XRPUSDT&type=BUY"
 ```
 **Verification**: Confirm error for unsupported pair.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Step 3: Trade Crypto (Task 3)
 **API**: `POST /api/trading/trade`
 
 **Description**: Allows users to buy or sell ETHUSDT/BTCUSDT using the latest aggregated price. Validates price within 1% threshold.
 
-**Endpoint**: `http://localhost:8080/api/trading/trade`
+**Endpoint**: `http://localhost:8081/api/v1/trading/trade`
 
 **Test Cases**:
 #### 3.1 Buy 1.5 ETH
-**Get Ask Price**: From Step 2.1 (e.g., 3005.50).
+**Get Ask Price**: From Step 2.1 (e.g., 2007.44).
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:8080/api/trading/trade" \
--H "Content-Type: application/json" \
--d '{
+curl --location 'http://localhost:8081/api/v1/trading/trade' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOltdLCJzdWIiOiJ0ZXN0LXVzZXItMSIsImlhdCI6MTc0Mjc4MTgxNCwiZXhwIjoxNzQyODE3ODE0fQ.hpRN6vA_XcL-TdVn5e1YsLbPaicCvXPEgMaKaO5uuzs' \
+--data '{
   "symbol": "ETHUSDT",
   "amount": "1.5",
   "tradeType": "BUY",
-  "price": "3005.50"
+  "price": "2007.44"
 }'
 ```
+
 **Expected Response**:
 ```json
 {
@@ -125,19 +139,21 @@ curl -X POST "http://localhost:8080/api/trading/trade" \
 **Verification**: Proceed to Step 4 to check wallet balance.
 
 #### 3.2 Sell 1.0 ETH
-**Get Bid Price**: `curl "http://localhost:8080/api/coins/aggregated-price?symbol=ETHUSDT&type=SELL"` (e.g., 3000.00).
+**Get Bid Price**: `curl "http://localhost:8081/api/v1/coins/aggregated-price?symbol=ETHUSDT&type=SELL"` (e.g.,2012.90).
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:8080/api/trading/trade" \
--H "Content-Type: application/json" \
--d '{
+curl --location 'http://localhost:8081/api/v1/trading/trade' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOltdLCJzdWIiOiJ0ZXN0LXVzZXItMSIsImlhdCI6MTc0Mjc4MTgxNCwiZXhwIjoxNzQyODE3ODE0fQ.hpRN6vA_XcL-TdVn5e1YsLbPaicCvXPEgMaKaO5uuzs' \
+--data '{
   "symbol": "ETHUSDT",
-  "amount": "1.0",
+  "amount": "1.5",
   "tradeType": "SELL",
-  "price": "3000.00"
+  "price": "2012.90"
 }'
 ```
+
 **Expected Response**:
 ```json
 {
@@ -153,15 +169,16 @@ curl -X POST "http://localhost:8080/api/trading/trade" \
 **Verification**: Check wallet balance (Step 4) and transactions (Step 5).
 
 #### 3.3 Insufficient Funds
-**Request**: Attempt to buy 20 ETH (20 * 3005.50 = 60,110 > 50,000 USDT).
+**Request**: Attempt to buy 20 ETH (30 * 3005.50 = 60223.2 > 50,000 USDT).
 ```bash
-curl -X POST "http://localhost:8080/api/trading/trade" \
--H "Content-Type: application/json" \
--d '{
+curl --location 'http://localhost:8081/api/v1/trading/trade' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOltdLCJzdWIiOiJ0ZXN0LXVzZXItMSIsImlhdCI6MTc0Mjc4MTgxNCwiZXhwIjoxNzQyODE3ODE0fQ.hpRN6vA_XcL-TdVn5e1YsLbPaicCvXPEgMaKaO5uuzs' \
+--data '{
   "symbol": "ETHUSDT",
-  "amount": "20",
+  "amount": "30",
   "tradeType": "BUY",
-  "price": "3005.50"
+  "price": "2007.44"
 }'
 ```
 **Expected Response**:
@@ -173,37 +190,49 @@ curl -X POST "http://localhost:8080/api/trading/trade" \
 ```
 
 #### 3.4 Price Mismatch
-**Request**: Use outdated price (e.g., 2500 vs. 3005.50).
+**Request**: Use outdated price (e.g., 107.44 vs. 2009.11).
 ```bash
-curl -X POST "http://localhost:8080/api/trading/trade" \
--H "Content-Type: application/json" \
--d '{
+curl --location 'http://localhost:8081/api/v1/trading/trade' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOltdLCJzdWIiOiJ0ZXN0LXVzZXItMSIsImlhdCI6MTc0Mjc4MTgxNCwiZXhwIjoxNzQyODE3ODE0fQ.hpRN6vA_XcL-TdVn5e1YsLbPaicCvXPEgMaKaO5uuzs' \
+--data '{
   "symbol": "ETHUSDT",
   "amount": "1",
   "tradeType": "BUY",
-  "price": "2500.00"
+  "price": "107.44"
 }'
 ```
 **Expected Response**:
 ```json
 {
   "status": 400,
-  "message": "Price has changed significantly. Please retry with the updated price: 3005.50"
+  "message": "Price has changed significantly. Please retry with the updated price: 2009.11"
 }
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 ### Step 4: Retrieve Wallet Balance (Task 4)
 **API**: `GET /api/trading/wallet`
 
 **Description**: Retrieves the user's wallet balances for USDT, ETH, and BTC.
 
-**Endpoint**: `http://localhost:8080/api/trading/wallet`
+**Endpoint**: `http://localhost:8081/api/v1/trading/wallet`
 
 **Test Cases**:
 #### 4.1 Initial Balance
 **Request**: Before any trades.
 ```bash
-curl "http://localhost:8080/api/trading/wallet"
+curl "http://localhost:8081/api/v1/trading/wallet"
 ```
 **Expected Response**:
 ```json
@@ -221,7 +250,7 @@ curl "http://localhost:8080/api/trading/wallet"
 #### 4.2 After Buying 1.5 ETH
 **Request**: After Step 3.1.
 ```bash
-curl "http://localhost:8080/api/trading/wallet"
+curl "http://localhost:8081/api/v1/trading/wallet"
 ```
 **Expected Response**:
 ```json
@@ -239,7 +268,7 @@ curl "http://localhost:8080/api/trading/wallet"
 #### 4.3 After Selling 1.0 ETH
 **Request**: After Step 3.2.
 ```bash
-curl "http://localhost:8080/api/trading/wallet"
+curl "http://localhost:8081/api/v1/trading/wallet"
 ```
 **Expected Response**:
 ```json
@@ -259,13 +288,13 @@ curl "http://localhost:8080/api/trading/wallet"
 
 **Description**: Retrieves the user's trading history.
 
-**Endpoint**: `http://localhost:8080/api/trading/transactions`
+**Endpoint**: `http://localhost:8081/api/v1/trading/transactions`
 
 **Test Cases**:
 #### 5.1 Initial History
 **Request**: Before any trades.
 ```bash
-curl "http://localhost:8080/api/trading/transactions"
+curl "http://localhost:8081/api/v1/trading/transactions"
 ```
 **Expected Response**:
 ```json
@@ -279,7 +308,7 @@ curl "http://localhost:8080/api/trading/transactions"
 #### 5.2 After Buy and Sell
 **Request**: After Steps 3.1 and 3.2.
 ```bash
-curl "http://localhost:8080/api/trading/transactions"
+curl "http://localhost:8081/api/v1/trading/transactions"
 ```
 **Expected Response**:
 ```json

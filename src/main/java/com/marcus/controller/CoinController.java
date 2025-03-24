@@ -32,7 +32,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/coin")
+@RequestMapping("${api.prefix}/coins")
 @Validated
 @Slf4j
 @Tag(name = "Coin Controller")

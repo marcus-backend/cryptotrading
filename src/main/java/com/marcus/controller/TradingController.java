@@ -90,9 +90,10 @@ public class TradingController {
     @Operation(summary = "Get wallet balance", description = "API to get wallet balance")
     @GetMapping("/wallet")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseData<?> getWalletBalance(@RequestParam @Min(1) long userId) {
-        log.info("Request to get wallet balance for userId={}", userId);
-        Wallet wallet = tradingService.getWalletBalance(userId);
+    public ResponseData<?> getWalletBalance() {
+        User user = userService.getByUsername(auth.getUsername());
+        log.info("Request to get wallet balance for userId={}", user.getId());
+        Wallet wallet = tradingService.getWalletBalance(user.getId());
         return new ResponseData<>(
                 HttpStatus.OK.value(),
                 Translator.toLocale("trading.wallet.success"),
